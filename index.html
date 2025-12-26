@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yılan Oyunu</title>
+<style>
+  body {
+    background: #111;
+    color: white;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    margin: 0;
+  }
+  canvas {
+    background: #f5f1e6;
+    border: 2px solid #2ecc71;
+    display: block;
+    margin: 10px auto;
+  }
+  button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 8px;
+  }
+  .controls {
+    display: grid;
+    grid-template-columns: 80px 80px 80px;
+    grid-template-rows: 80px 80px 80px;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 15px;
+  }
+  .controls button {
+    font-size: 28px;
+    border-radius: 10px;
+  }
+</style>
+</head>
+<body>
+
+<h2>🐍 Yılan Oyunu</h2>
+<p>Skor: <span id="score">0</span></p>
+
+<canvas id="game" width="360" height="360"></canvas>
+
+<div class="controls">
+  <div></div>
+  <button onclick="setDir(0,-1)">⬆️</button>
+  <div></div>
+
+  <button onclick="setDir(-1,0)">⬅️</button>
+  <div></div>
+  <button onclick="setDir(1,0)">➡️</button>
+
+  <div></div>
+  <button onclick="setDir(0,1)">⬇️</button>
+  <div></div>
+</div>
+
+<button onclick="restartGame()">🔁 Yeniden Oyna</button>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+const grid = 30;
+const tileCount = canvas.width / grid;
+
+// Görseller
+const headImg  = new Image();
+const bodyImg  = new Image();
+const appleImg = new Image();
+
+headImg.src  = "snake_head.png";
+bodyImg.src  = "snake_body.png";
+appleImg.src = "apple.png";
+
+let loaded = 0;
+[headImg, bodyImg, appleImg].forEach(img => img.onload = () => {
+  loaded++;
+  if (loaded === 3) initGame();
+});
+
+let snake, dx, dy, food, score, loop;
+
+function initGame() {
+  snake = [
+    { x: 6, y: 6 },
+    { x: 5, y: 6 },
+    { x: 4, y: 6 }
+  ];
+  dx = 1;
+  dy = 0;
+  score = 0;
+  food = randomFood();
+  document.getElementById("score").innerText = score;
+
+  clearInterval(loop);
+  loop = setInterval(gameLoop, 170);
+}
+
+function randomFood() {
+  return {
+    x: Math.floor(Math.random() * tileCount),
+    y: Math.floor(Math.random() * tileCount)
+  };
+}
+
+// 📱 Dokunmatik + PC ortak yön fonksiyonu
+function setDir(x, y) {
+  if (dx === -x && dy === -y) return;
+  dx = x;
+  dy = y;
+}
+
+// ⌨️ Klavye
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowUp")    setDir(0,-1);
+  if (e.key === "ArrowDown")  setDir(0,1);
+  if (e.key === "ArrowLeft")  setDir(-1,0);
+  if (e.key === "ArrowRight") setDir(1,0);
+});
+
+function gameLoop() {
+  const head = {
+    x: snake[0].x + dx,
+    y: snake[0].y + dy
+  };
+
+  if (
+    head.x < 0 || head.y < 0 ||
+    head.x >= tileCount || head.y >= tileCount ||
+    snake.some(p => p.x === head.x && p.y === head.y)
+  ) {
+    clearInterval(loop);
+    alert("Oyun Bitti! Skor: " + score);
+    return;
+  }
+
+  snake.unshift(head);
+
+  if (head.x === food.x && head.y === food.y) {
+    score++;
+    document.getElementById("score").innerText = score;
+    food = randomFood();
+  } else {
+    snake.pop();
+  }
+
+  draw();
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // 🍎 Elma
+  ctx.drawImage(
+    appleImg,
+    food.x * grid,
+    food.y * grid,
+    grid,
+    grid
+  );
+
+  // 🐍 Gövde
+  for (let i = 1; i < snake.length; i++) {
+    const p = snake[i];
+    ctx.drawImage(
+      bodyImg,
+      p.x * grid,
+      p.y * grid,
+      grid,
+      grid
+    );
+  }
+
+  // 🐍 Kafa
+  const h = snake[0];
+  ctx.save();
+  ctx.translate(
+    h.x * grid + grid / 2,
+    h.y * grid + grid / 2
+  );
+
+  let angle = 0;
+  if (dx === -1) angle = Math.PI;
+  if (dy === 1)  angle = Math.PI / 2;
+  if (dy === -1) angle = -Math.PI / 2;
+
+  ctx.rotate(angle);
+  ctx.drawImage(headImg, -grid/2, -grid/2, grid, grid);
+  ctx.restore();
+}
+
+function restartGame() {
+  initGame();
+}
+</script>
+
+</body>
+</html>
