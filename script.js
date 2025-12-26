@@ -52,11 +52,20 @@ function draw() {
 
   for (let i = 0; i < snake.length; i++) {
     if (i === 0) {
-      ctx.drawImage(headImg, snake[i].x, snake[i].y, box, box);
-    } else {
-      ctx.drawImage(bodyImg, snake[i].x, snake[i].y, box, box);
-    }
-  }
+  ctx.save();
+
+  ctx.translate(snake[i].x + box / 2, snake[i].y + box / 2);
+
+  let angle = 0;
+  if (direction === "LEFT") angle = Math.PI;
+  if (direction === "UP") angle = -Math.PI / 2;
+  if (direction === "DOWN") angle = Math.PI / 2;
+
+  ctx.rotate(angle);
+
+  ctx.drawImage(headImg, -box / 2, -box / 2, box, box);
+  ctx.restore();
+}
 
   ctx.drawImage(appleImg, food.x, food.y, box, box);
 
