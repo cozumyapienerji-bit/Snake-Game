@@ -1,0 +1,44 @@
+body {
+  background: #111;
+  color: #fff;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  margin: 0;
+  padding: 10px;
+}
+
+h1 {
+  margin: 10px 0;
+}
+
+#score {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+canvas {
+  background: #f4f1e6;
+  border: 3px solid #2ecc71;
+  display: block;
+  margin: 0 auto;
+}
+
+.controls {
+  margin-top: 15px;
+}
+
+.controls button {
+  font-size: 28px;
+  padding: 10px 15px;
+  margin: 5px;
+  border-radius: 10px;
+  border: none;
+}
+
+#restart {
+  margin-top: 15px;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: none;
+}
